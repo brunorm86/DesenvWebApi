@@ -1,4 +1,4 @@
-namespace MeuCrud.Api.Models;
+namespace DesenvWebApi.Models;
 
 // A classe Produto representa a tabela "Produtos" no banco de dados.
 // O Entity Framework usa esta classe para:
@@ -7,7 +7,7 @@ namespace MeuCrud.Api.Models;
 //   3. Mapear resultados de queries para objetos C#
 //
 // Convenção de nomenclatura do EF:
-//   - O nome da tabela no banco será o nome da classe no plural: "Produtos"
+//   - O nome da tabela no banco será o dotnome da classe no plural: "Produtos"
 //   - A propriedade "Id" é automaticamente reconhecida como chave primária
 public class Produto
 {

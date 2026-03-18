@@ -1,10 +1,10 @@
 // Program.cs
 
+using DesenvWebApi.Data;
 using Microsoft.EntityFrameworkCore;
-using MeuCrud.Api.Data;
 
 // =====================================================================
-// BUILDER — fase de configuração
+// BUILDER — fase de configurdotnet ef migrations add CriacaoInicialação
 // Aqui registramos todos os serviços que a aplicação vai usar.
 // =====================================================================
 var builder = WebApplication.CreateBuilder(args);

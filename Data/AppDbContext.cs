@@ -3,10 +3,11 @@
 // Importações necessárias:
 // - Microsoft.EntityFrameworkCore: namespace do EF Core (DbContext, DbSet, etc.)
 // - MeuCrud.Api.Models: namespace onde estão nossas classes de modelo
-using Microsoft.EntityFrameworkCore;
-using MeuCrud.Api.Models;
 
-namespace MeuCrud.Api.Data;
+using DesenvWebApi.Models;
+using Microsoft.EntityFrameworkCore;
+
+namespace DesenvWebApi.Data;
 
 // AppDbContext herda de DbContext (classe base do EF Core).
 // Herdando de DbContext, nossa classe ganha todos os poderes do EF:
