@@ -41,44 +41,57 @@ public class ProdutosController : ControllerBase
     // async/await permite que o servidor atenda outras requisições
     // enquanto espera o banco de dados responder.
     // =====================================================================
-    [HttpGet]
-    public async Task<ActionResult<IEnumerable<Produto>>> GetProdutos()
-    {
-        // _context.Produtos é o DbSet<Produto> — representa a tabela "Produtos".
-        // .ToListAsync() executa: SELECT * FROM "Produtos"
-        // e retorna o resultado como uma List<Produto>.
-        var produtos = await _context.Produtos.ToListAsync();
+    // Substitua APENAS os dois métodos GET no ProdutosController.
+// Os métodos POST, PUT e DELETE permanecem iguais.
 
-        // Ok(produtos) retorna HTTP 200 com os produtos serializados em JSON.
-        return Ok(produtos);
-    }
-
-    // =====================================================================
-    // GET /api/produtos/5
-    // Retorna um único produto pelo ID.
+// =====================================================================
+// GET /api/produtos — agora inclui a Categoria de cada produto
+// =====================================================================
+[HttpGet]
+public async Task<ActionResult<IEnumerable<Produto>>> GetProdutos()
+{
+    // ANTES (sem relacionamento):
+    //   var produtos = await _context.Produtos.ToListAsync();
+    //   → SQL: SELECT * FROM "Produtos"
+    //   → produto.Categoria seria null
     //
-    // {id} na rota é um parâmetro dinâmico — o valor da URL é capturado
-    // e passado como parâmetro para o método.
-    // Exemplo: GET /api/produtos/3 → id = 3
-    // =====================================================================
-    [HttpGet("{id}")]
-    public async Task<ActionResult<Produto>> GetProduto(int id)
+    // DEPOIS (com Include):
+    //   → SQL: SELECT p.*, c.* FROM "Produtos" p
+    //          LEFT JOIN "Categorias" c ON c."Id" = p."CategoriaId"
+    //   → produto.Categoria é o objeto completo { Id, Nome, Descricao }
+    //
+    // .Include(p => p.Categoria) é o "Eager Loading":
+    // instrui o EF a carregar a entidade relacionada NA MESMA QUERY.
+    var produtos = await _context.Produtos
+        .Include(p => p.Categoria)
+        .ToListAsync();
+
+    return Ok(produtos);
+}
+
+// =====================================================================
+// GET /api/produtos/5 — inclui a Categoria do produto
+// =====================================================================
+[HttpGet("{id}")]
+public async Task<ActionResult<Produto>> GetProduto(int id)
+{
+    // Note que aqui usamos FirstOrDefaultAsync em vez de FindAsync.
+    // FindAsync não suporta .Include() — ele busca diretamente pelo PK
+    // sem possibilidade de incluir relacionamentos.
+    //
+    // FirstOrDefaultAsync permite encadear .Include() e .Where()
+    // antes de executar a query.
+    var produto = await _context.Produtos
+        .Include(p => p.Categoria)
+        .FirstOrDefaultAsync(p => p.Id == id);
+
+    if (produto == null)
     {
-        // FindAsync busca pelo valor da chave primária.
-        // Equivalente a: SELECT * FROM "Produtos" WHERE "Id" = @id LIMIT 1
-        // Retorna null se não encontrar.
-        var produto = await _context.Produtos.FindAsync(id);
-
-        // Se o produto não foi encontrado, retornamos HTTP 404 Not Found
-        // com uma mensagem explicativa em JSON.
-        if (produto == null)
-        {
-            return NotFound(new { mensagem = $"Produto com ID {id} não encontrado." });
-        }
-
-        // HTTP 200 com o produto encontrado
-        return Ok(produto);
+        return NotFound(new { mensagem = $"Produto com ID {id} não encontrado." });
     }
+
+    return Ok(produto);
+}
 
     // =====================================================================
     // POST /api/produtos
@@ -156,6 +169,7 @@ public class ProdutosController : ControllerBase
         produtoExistente.Descricao = produto.Descricao;
         produtoExistente.Preco = produto.Preco;
         produtoExistente.Quantidade = produto.Quantidade;
+        produtoExistente.CategoriaId = produto.CategoriaId;  // ← NOVA LINHA
 
         // SaveChangesAsync executa o UPDATE no banco:
         // UPDATE "Produtos"
