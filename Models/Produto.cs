@@ -51,4 +51,22 @@ public class Produto
     // (só disponível após .Include() na query)
     // =====================================================================
     public Categoria? Categoria { get; set; }
+
+    // Adicione esta propriedade ao final da classe Produto,
+    // DEPOIS das propriedades CategoriaId e Categoria que já existem:
+
+    // =====================================================================
+    // PROPRIEDADE DE NAVEGAÇÃO para o DetalheProduto (relacionamento 1-para-1)
+    //
+    // Diferente do 1-para-N (onde usamos ICollection<T>),
+    // no 1-para-1 usamos o tipo diretamente: DetalheProduto?
+    // Porque um produto tem NO MÁXIMO UM detalhe (não uma coleção).
+    //
+    // É nullable (?) porque nem todo produto precisa ter um detalhe cadastrado.
+    // Um Notebook pode ter especificações técnicas detalhadas,
+    // mas um pacote de Arroz provavelmente não precisa.
+    //
+    // Só é preenchida quando usamos .Include(p => p.DetalheProduto) na query.
+    // =====================================================================
+    public DetalheProduto? DetalheProduto { get; set; }
 }

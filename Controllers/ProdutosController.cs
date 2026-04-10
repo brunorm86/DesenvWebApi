@@ -83,6 +83,7 @@ public async Task<ActionResult<Produto>> GetProduto(int id)
     // antes de executar a query.
     var produto = await _context.Produtos
         .Include(p => p.Categoria)
+        .Include(p => p.DetalheProduto)
         .FirstOrDefaultAsync(p => p.Id == id);
 
     if (produto == null)
